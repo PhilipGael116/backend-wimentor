@@ -1,0 +1,65 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// Roles
+
+enum Role {
+  Mentor
+  Mentee
+}
+
+// User model
+model User {
+  id       String @unique @default(uuid())
+  Fname    String
+  Lname    String
+  email    String @unique
+  phone    String @unique
+  password String
+  role     Role
+
+  mentorProfile MentorProfile?
+  menteeProfile MenteeProfile?
+}
+
+// Mentor Profile
+model MentorProfile {
+  userId String @id
+  user   User   @relation(fields: [userId], references: [id])
+
+  // educational level
+  hasOlevel    Boolean @default(false)
+  oLevelSeries String?
+  hasAlevel    Boolean @default(false)
+  aLevelseries String?
+
+  // proffesional info
+  currentStatus String
+  bio           String @db.Text
+  location      String
+
+  // perfomance 
+  avRating Float           @default(0.0)
+  mentees  MenteeProfile[]
+
+  // timestamps
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model MenteeProfile {
+  userId              String         @id
+  user                User           @relation(fields: [userId], references: [id])
+  mentorProfile       MentorProfile? @relation(fields: [mentorProfileUserId], references: [userId])
+  mentorProfileUserId String?
+}
