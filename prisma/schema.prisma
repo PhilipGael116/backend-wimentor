@@ -9,6 +9,7 @@ generator client {
 
 datasource db {
   provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 // Roles
@@ -64,22 +65,22 @@ model MentorProfile {
 
 // Mentee Profile
 model MenteeProfile {
-  id String @id @default(uuid())
-  userId String @unique
-  user   User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id      String          @id @default(uuid())
+  userId  String          @unique
+  user    User            @relation(fields: [userId], references: [id], onDelete: Cascade)
   mentors MentorProfile[]
   reviews Review[]
 }
 
 // Reviews
 model Review {
-  id       String @id @default(uuid())
+  id       String        @id @default(uuid())
   authorId String
-  author   MenteeProfile   @relation(fields: [authorId], references: [id])
+  author   MenteeProfile @relation(fields: [authorId], references: [id])
   mentorId String
-  mentor   MentorProfile   @relation(fields: [mentorId], references: [id])
+  mentor   MentorProfile @relation(fields: [mentorId], references: [id])
 
-  rating Int
+  rating  Int
   comment String @db.Text
 
   createdAt DateTime @default(now())
