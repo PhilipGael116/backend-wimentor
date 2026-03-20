@@ -3,52 +3,58 @@ import bcrypt from "bcryptjs"
 import jwt from "jsonwebtoken"
 
 export const login = async (req, res) => {
-    const { email, password } = req.body
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    try {
+        const { email, password } = req.body
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-    // check for empty fields
-    if (!email || !password) {
-        console.log("Error: All fields are required")
-        return res.status(400).json({ message: "All fields are required" })
+        // check for empty fields
+        if (!email || !password) {
+            console.log("Error: All fields are required")
+            return res.status(400).json({ message: "All fields are required" })
+        }
+
+        // check password length
+        if (password.length < 8) {
+            console.log("Error: Password must be 8 characters or more")
+            return res.status(400).json({ message: "Password must be at least 8 characters" })
+        }
+
+        // Check if email is valid
+        if (!emailRegex.test(email)) {
+            console.log("Error: Invalid email format")
+            return res.status(400).json({ message: "Invalid email format" })
+        }
+
+        // check if user exists already
+        const user = await prisma.user.findUnique({
+            where: { email: email }
+        })
+
+        if (!user) {
+            console.log("error: user does not exist")
+            res.status(404).json({ message: "Invalid credentials" })
+        }
+
+        // check if password matches
+        const isMatch = await bcrypt.compare(password, user.password)
+
+        if (!isMatch) {
+            console.log("error: Invalid Credentials")
+            res.status(400).json({ message: "Invalid credentials" })
+        }
+
+        const token = jwt.sign(
+            { id: user.id, role: user.role },
+            process.env.JWT_SECRET,
+            { expiresIn: "15d" }
+        )
+
+        console.log("user logged in")
+        res.status(200).json({ token, user })
+    } catch (error) {
+        console.log(`Error during registration ${error.message}`);
+        res.status(500).json({ message: "Error creating user" })
     }
-
-    // check password length
-    if (password.length < 8) {
-        console.log("Error: Password must be 8 characters or more")
-        return res.status(400).json({ message: "Password must be at least 8 characters" })
-    }
-
-    // Check if email is valid
-    if (!emailRegex.test(email)) {
-        console.log("Error: Invalid email format")
-        return res.status(400).json({ message: "Invalid email format" })
-    }
-
-    // check if user exists already
-    const user = prisma.user.findUnique({
-        where: { email: email }
-    })
-
-    if (!user) {
-        console.log("error: user does not exist")
-        res.status(404).json({ message: "Invalid credentials" })
-    }
-
-    // check if password matches
-    const isMatch = await bcrypt.compare(password, prisma.user.password)
-
-    if (!isMatch) {
-        console.log("error: Invalid Credentials")
-        res.status(400).json({ message: "Invalid credentials" })
-    }
-
-    const token = jwt.sign(
-        { id: user.id, role: user.role },
-        process.env.JWT_SECRET,
-        { expiresIn: "15d" }
-    )
-
-    res.status(200).json({ token, user })
 }
 
 
@@ -108,6 +114,12 @@ export const register = async (req, res) => {
             },
         })
 
+        const token = jwt.sign(
+            { id: user.id, role: user.role },
+            process.env.JWT_SECRET,
+            { expiresIn: "15d" }
+        )
+
         res.status(201).json({
             status: "success",
             data: {
@@ -118,6 +130,7 @@ export const register = async (req, res) => {
                 role
             }
         })
+        console.log("user created")
     } catch (error) {
         console.log(`Error during registration ${error.message}`);
         res.status(500).json({ message: "Error creating user" })

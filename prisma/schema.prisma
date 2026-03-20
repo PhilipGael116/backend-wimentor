@@ -46,7 +46,7 @@ model MentorProfile {
   hasOlevel    Boolean @default(false)
   oLevelSeries String?
   hasAlevel    Boolean @default(false)
-  aLevelseries String?
+  aLevelSeries String?
 
   // proffesional info
   currentStatus String
