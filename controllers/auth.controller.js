@@ -142,4 +142,20 @@ export const register = async (req, res) => {
 }
 
 
+export const logout = async (req, res) => {
+    try {
+        // This clears the cookie named "jwt" that we look for in the middleware
+        res.cookie('jwt', '', {
+            httpOnly: true,
+            expires: new Date(0) // Expire it immediately (Jan 1st, 1970)
+        });
+
+        res.status(200).json({ message: "Logged out successfully" });
+    } catch (error) {
+        console.error(`Error during logout: ${error.message}`);
+        res.status(500).json({ message: "Error logging out" });
+    }
+}
+
+
 
