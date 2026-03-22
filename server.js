@@ -25,6 +25,10 @@ app.use("/api", menteeRoutes)
 
 connectDB();
 
+app.get("/", (req, res) => {
+    res.send("Backend is live on port ", PORT);
+})
+
 app.listen(PORT, () => {
     console.log("Server running on port ", PORT);
 })
