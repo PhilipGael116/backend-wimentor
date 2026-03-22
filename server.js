@@ -3,6 +3,7 @@ import { config } from "dotenv";
 import { connectDB } from "./config/db.js";
 import authRoutes from "./routes/auth.routes.js"
 import mentorRoutes from "./routes/mentor.routes.js"
+import reviewRoutes from "./routes/review.routes.js"
 
 config()
 
@@ -18,6 +19,7 @@ app.use(express.urlencoded({ extended: true }));
 // routes
 app.use("/api/auth", authRoutes)
 app.use("/api", mentorRoutes)
+app.use("/api", reviewRoutes)
 
 connectDB();
 

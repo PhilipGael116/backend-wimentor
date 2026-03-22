@@ -99,7 +99,11 @@ export const getAllMentees = async (req, res) => {
         const mentor = await prisma.mentorProfile.findUnique({
             where: { userId: req.user.id },
             include: {
-                mentees: true
+                mentees: {
+                    include: {
+                        user: true
+                    }
+                }
             }
         });
 
@@ -116,4 +120,37 @@ export const getAllMentees = async (req, res) => {
     }
 
 
+}
+
+export const getAllReviews = async (req, res) => {
+    try {
+        // make sure user is mentor
+        if (req.user.role !== "Mentor") {
+            return res.status(403).json({ message: "user must be a mentor" })
+        }
+
+        const mentor = await prisma.mentorProfile.findUnique({
+            where: { userId: req.user.id },
+            include: {
+                reviews: {
+                    include: {
+                        author: {
+                            include: {
+                                user: true
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        if (!mentor) {
+            return res.status(404).json({ message: "Mentor profile not found" })
+        }
+
+        return res.status(200).json({ status: "success", data: mentor.reviews })
+    } catch (error) {
+        console.log(`Error getting reviews: ${error.message}`);
+        res.status(500).json({ message: "Error getting reviews" });
+    }
 }
