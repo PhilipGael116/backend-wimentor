@@ -4,6 +4,7 @@ import { connectDB } from "./config/db.js";
 import authRoutes from "./routes/auth.routes.js"
 import mentorRoutes from "./routes/mentor.routes.js"
 import reviewRoutes from "./routes/review.routes.js"
+import menteeRoutes from "./routes/mentee.routes.js"
 
 config()
 
@@ -20,6 +21,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use("/api/auth", authRoutes)
 app.use("/api", mentorRoutes)
 app.use("/api", reviewRoutes)
+app.use("/api", menteeRoutes)
 
 connectDB();
 
