@@ -92,3 +92,46 @@ export const getAllMentors = async (req, res) => {
         res.status(500).json({ message: "Internal server error" });
     }
 }
+
+
+export const getMentorById = async (req, res) => {
+    try {
+        const { mentorUserId } = req.params;
+
+        // 1. Find the specific Mentor
+        const mentor = await prisma.mentorProfile.findUnique({
+            where: { userId: mentorUserId }, // Use the ID from the URL
+            include: {
+                user: {
+                    select: {
+                        Fname: true,
+                        Lname: true,
+                        email: true
+                    }
+                },
+                // 2. Also bring their reviews so the Mentee can see feedback!
+                reviews: {
+                    include: {
+                        author: { // To show who wrote each review
+                            include: { user: true }
+                        }
+                    }
+                },
+                // 3. And show how many students they have!
+                _count: {
+                    select: { mentees: true }
+                }
+            }
+        });
+
+        if (!mentor) {
+            return res.status(404).json({ message: "Mentor not found" });
+        }
+
+        res.status(200).json({ status: "success", data: mentor });
+
+    } catch (error) {
+        console.log(`Error getting mentor: ${error.message}`);
+        res.status(500).json({ message: "Internal server error" });
+    }
+}
