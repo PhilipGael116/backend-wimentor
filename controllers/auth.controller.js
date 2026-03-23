@@ -159,3 +159,30 @@ export const logout = async (req, res) => {
 
 
 
+export const getMe = async (req, res) => {
+    try {
+        // 1. We get the User ID from the AuthMiddleware
+        const user = await prisma.user.findUnique({
+            where: { id: req.user.id },
+            include: {
+                mentorProfile: true, // Bring their profile if it exists
+                menteeProfile: true
+            }
+        });
+
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        // 2. Return the data (Keep the password private!)
+        const { password, ...userData } = user;
+        res.status(200).json({ status: "success", data: userData });
+
+    } catch (error) {
+        console.error(`Error in getMe: ${error.message}`);
+        res.status(500).json({ message: "Internal server error" });
+    }
+}
+
+
+

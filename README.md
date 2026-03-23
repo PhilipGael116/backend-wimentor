@@ -28,6 +28,7 @@
 *   `POST /register` - Create a new user (Auto-creates Mentee Profile if selected).
 *   `POST /login` - Sign in and receive an Auth Token.
 *   `POST /logout` - Clear cookies and end the session.
+*   `GET /me` - Fetch the current logged-in user's complete profile (Must provide token).
 
 #### 👨‍🏫 Mentor Dashboard (`/api`)
 *   `POST /setup` - The Profile Wizard for new Mentors.
