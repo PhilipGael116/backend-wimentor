@@ -25,23 +25,165 @@
 ### 📑 API Documentation (Routes):
 
 #### 🏁 Authentication (`/api/auth`)
-*   `POST /register` - Create a new user (Auto-creates Mentee Profile if selected).
-*   `POST /login` - Sign in and receive an Auth Token.
-*   `POST /logout` - Clear cookies and end the session.
-*   `GET /me` - Fetch the current logged-in user's complete profile (Must provide token).
+
+**1. Register (`POST /register`)**
+Creates a new user account. Auto-creates a `MenteeProfile` if the role is "Mentee".
+*   **Request Body:**
+    ```json
+    {
+      "Fname": "John",
+      "Lname": "Doe",
+      "email": "john.doe@example.com",
+      "password": "securepassword123",
+      "phone": "670000000",
+      "role": "Mentor"
+    }
+    ```
+*   **Response (201 Created):**
+    ```json
+    {
+      "status": "success",
+      "token": "eyJhbGciOiJIUzI1NiIsInR...",
+      "data": {
+        "Fname": "John",
+        "Lname": "Doe",
+        "email": "john.doe@example.com",
+        "phone": "670000000",
+        "role": "Mentor"
+      }
+    }
+    ```
+
+**2. Login (`POST /login`)**
+*   **Request Body:**
+    ```json
+    {
+      "email": "john.doe@example.com",
+      "password": "securepassword123"
+    }
+    ```
+*   **Response (200 OK):** Returns the JWT token and basic user info.
+
+**3. Get Me (`GET /me`)**
+Requires authentication. Fetches complete profile info of the logged-in user.
+*   **Response (200 OK):**
+    ```json
+    {
+      "status": "success",
+      "data": {
+        "id": "user-uuid-123",
+        "Fname": "John",
+        "Lname": "Doe",
+        "role": "Mentor",
+        "mentorProfile": {
+          "id": "profile-uuid-123",
+          "bio": "Expert in Software Engineering",
+          "avRating": 4.8
+        }
+      }
+    }
+    ```
+
+**4. Logout (`POST /logout`)**
+Clears the HTTP-only cookie to end the session.
+
+---
 
 #### 👨‍🏫 Mentor Dashboard (`/api`)
-*   `POST /setup` - The Profile Wizard for new Mentors.
-*   `POST /follow/:mentorUserId` - Connect a student to a teacher.
-*   `POST /unfollow/:mentorUserId` - Revoke a connection.
-*   **`GET /getAllMentees`** - Fetch the current mentor’s student list.
-*   **`GET /getAllReviews`** - See feedback from all students.
+*(All routes require a valid JWT token)*
+
+**1. Setup Profile (`POST /setup`)**
+For Mentors to set up their professional portfolio.
+*   **Request Body:**
+    ```json
+    {
+      "hasOlevel": true,
+      "oLevelSeries": "Sciences",
+      "hasAlevel": false,
+      "aLevelSeries": "",
+      "currentStatus": "Senior Developer",
+      "bio": "I teach clean code and system design.",
+      "location": "Yaoundé"
+    }
+    ```
+
+**2. Follow connection (`POST /follow/:mentorUserId`)**
+Mentee starts following a specific Mentor.
+*   **Response (200 OK):**
+    ```json
+    { "message": "successfully followed mentor" }
+    ```
+
+**3. Unfollow connection (`POST /unfollow/:mentorUserId`)**
+Mentee revokes the connection.
+
+**4. Get All Mentees (`GET /getAllMentees`)**
+Mentor fetches their list of current students.
+*   **Response (200 OK):**
+    ```json
+    {
+      "status": "success",
+      "data": [
+        {
+          "id": "mentee-profile-uuid",
+          "user": {
+            "Fname": "Jane",
+            "Lname": "Smith",
+            "email": "jane@example.com"
+          }
+        }
+      ]
+    }
+    ```
+
+**5. Get All Reviews (`GET /getAllReviews`)**
+Mentor fetches their feedback.
+*   **Response (200 OK):**
+    ```json
+    {
+      "status": "success",
+      "data": [
+        {
+          "rating": 5,
+          "comment": "Amazing teacher! Explained Prisma perfectly.",
+          "author": { "user": { "Fname": "Jane", "Lname": "Smith" } }
+        }
+      ]
+    }
+    ```
+
+---
 
 #### 🎓 Mentee Discovery (`/api`)
-*   `GET /getAllMentors` - View every teacher on the platform with counts and ratings.
-*   `GET /getMentor/:mentorUserId` - View a deep-profile of a specific mentor.
-*   `GET /mymentors` - List every mentor the student is currently following.
-*   `GET /myReviews` - See feedback the student has written.
+*(All routes require a valid JWT token)*
+
+**1. Get All Mentors (`GET /getAllMentors`)**
+Fetches a lightweight list of all Mentors on the platform.
+*   **Response (200 OK):**
+    ```json
+    {
+      "status": "success",
+      "data": [
+        {
+          "bio": "I teach clean code and system design.",
+          "avRating": 4.8,
+          "user": { "Fname": "John", "Lname": "Doe" },
+          "_count": { "mentees": 24 }
+        }
+      ]
+    }
+    ```
+
+**2. Get Specific Mentor (`GET /getMentor/:mentorUserId`)**
+Fetches a deep profile of one Mentor, including reviews.
+*   **Response (200 OK):** Returns detailed mentor data plus nested `reviews` objects.
+
+**3. My Mentors (`GET /mymentors`)**
+Shows the Mentee all the teachers they are currently following.
+*   **Response (200 OK):** Returns array of MentorProfiles populated with User details.
+
+**4. My Reviews (`GET /myReviews`)**
+Shows the Mentee all the reviews they have previously written.
 
 ---
 

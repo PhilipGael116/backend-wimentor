@@ -106,7 +106,8 @@ export const getMentorById = async (req, res) => {
                     select: {
                         Fname: true,
                         Lname: true,
-                        email: true
+                        email: true,
+                        phone: true
                     }
                 },
                 // 2. Also bring their reviews so the Mentee can see feedback!
