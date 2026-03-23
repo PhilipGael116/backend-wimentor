@@ -1,4 +1,5 @@
 import express from "express"
+import cors from "cors"
 import { config } from "dotenv";
 import { connectDB } from "./config/db.js";
 import authRoutes from "./routes/auth.routes.js"
@@ -17,6 +18,12 @@ const PORT = process.env.PORT || 5001
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// cors
+app.use(cors({
+    origin: ["http://localhost:5173", "https://backend-wimentor.onrender.com/"],
+    credentials: true
+}));
+
 // routes
 app.use("/api/auth", authRoutes)
 app.use("/api", mentorRoutes)
@@ -26,7 +33,7 @@ app.use("/api", menteeRoutes)
 connectDB();
 
 app.get("/", (req, res) => {
-    res.send("Backend is live on port ", PORT);
+    res.send(`Backend is live on port ${PORT}`);
 })
 
 app.listen(PORT, () => {
