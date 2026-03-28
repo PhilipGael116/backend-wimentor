@@ -154,3 +154,46 @@ export const getAllReviews = async (req, res) => {
         res.status(500).json({ message: "Error getting reviews" });
     }
 }
+
+
+export const getMentorReviews = async (req, res) => {
+    try {
+        const { mentorUserId } = req.params;
+
+        // 1. Check if the mentor actually exists
+        const mentor = await prisma.mentorProfile.findUnique({
+            where: { userId: mentorUserId },
+            include: {
+                // 2. Bring in all their reviews
+                reviews: {
+                    include: {
+                        author: { // Bring in the person who wrote the review
+                            include: {
+                                user: { // Get the author's First and Last Name
+                                    select: {
+                                        Fname: true,
+                                        Lname: true
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    orderBy: {
+                        createdAt: 'desc' // Show the newest reviews first!
+                    }
+                }
+            }
+        });
+
+        if (!mentor) {
+            return res.status(404).json({ message: "Mentor not found" });
+        }
+
+        // Return just the array of reviews
+        res.status(200).json({ status: "success", data: mentor.reviews });
+
+    } catch (error) {
+        console.log(`Error getting mentor reviews: ${error.message}`);
+        res.status(500).json({ message: "Internal server error" });
+    }
+}

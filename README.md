@@ -185,6 +185,44 @@ Shows the Mentee all the teachers they are currently following.
 **4. My Reviews (`GET /myReviews`)**
 Shows the Mentee all the reviews they have previously written.
 
+**5. Create Review (`POST /createReview`)**
+Allows a Mentee to leave feedback and a rating for a specific Mentor.
+*   **Request Body:**
+    ```json
+    {
+      "mentorId": "profile-uuid-123",
+      "rating": 5,
+      "comment": "Excellent sessions, highly recommended!"
+    }
+    ```
+*   **Response (201 Created):**
+    ```json
+    {
+      "status": "success",
+      "data": {
+        "id": "review-uuid-123",
+        "rating": 5,
+        "comment": "Excellent sessions, highly recommended!"
+      }
+    }
+    ```
+
+**6. Get Mentor Reviews (`GET /getMentorReview/:mentorUserId`)**
+Fetches all reviews exclusively for a specific mentor.
+*   **Response (200 OK):**
+    ```json
+    {
+      "status": "success",
+      "data": [
+        {
+          "rating": 5,
+          "comment": "Excellent sessions, highly recommended!",
+          "author": { "user": { "Fname": "John", "Lname": "Doe" } }
+        }
+      ]
+    }
+    ```
+
 ---
 
 ### 🚀 Getting Started:

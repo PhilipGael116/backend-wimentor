@@ -20,7 +20,7 @@ app.use(express.urlencoded({ extended: true }));
 
 // cors
 app.use(cors({
-    origin: ["http://localhost:5173", "https://backend-wimentor.onrender.com/"],
+    origin: ["http://localhost:5173", "https://mentorat-zeta.vercel.app"],
     credentials: true
 }));
 
